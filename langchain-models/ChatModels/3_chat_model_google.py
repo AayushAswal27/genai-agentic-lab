@@ -3,8 +3,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-model = ChatGoogleGenerativeAI(model="gemini-3.6-flash",temperature=0)
+model = ChatGoogleGenerativeAI(model="gemini-3.6-flash",temperature=1.5, max_output_tokens=5)
 
-result = model.invoke("Suggest me 5 Indian male names")
+result = model.invoke("Suggest me a poem")
 
 print(result.text)
