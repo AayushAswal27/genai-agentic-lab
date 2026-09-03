@@ -1,0 +1,15 @@
+langchain
+langchain-core
+langchain-community
+langchain-openai
+langchain-anthropic
+langchain-google-genai
+langchain-huggingface
+transformers
+huggingface-hub
+sentence-transformers
+torch
+accelerate
+python-dotenv
+numpy
+scikit-learn
