@@ -33,7 +33,7 @@ length_input = st.selectbox(
 
 template = PromptTemplate(
     template="Summarize {paper_input} in {style_input} style, {length_input} length",
-    input_variables=["paper_input", "style_input","length_input"],   # length_input missing → ERROR
+    input_variables=["paper_input", "style_input","length_input"], 
     validate_template=True
 )
 
