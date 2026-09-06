@@ -23,4 +23,4 @@ chain = prompt| model | parser
 result = chain.invoke({"topic": "Cricket"})
 print(result)
 
-chain.get_graph().print_ascii(). #Visualizing the chain
+chain.get_graph().print_ascii() #Visualizing the chain
