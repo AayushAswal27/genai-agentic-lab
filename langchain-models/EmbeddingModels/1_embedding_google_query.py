@@ -7,5 +7,5 @@ embedding = GoogleGenerativeAIEmbeddings(model="models/gemini-embedding-001")
 
 vector = embedding.embed_query("Delhi is the capital of India")
 
-print(len(vector))   # 768
+print(len(vector)) 
 print(vector[:5])
