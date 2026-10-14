@@ -6,7 +6,7 @@ Messi quickly became known for his incredible dribbling, speed, passing, vision,
 
 With Argentina, Messi finally achieved his biggest international dream by winning the Copa América in 2021 and the FIFA World Cup in 2022. His performances in the 2022 World Cup were especially memorable, as he scored important goals and led Argentina to victory.
 
-Messi's journey is an inspiration because he faced difficulties early in his life but never gave up on his dream. His talent, hard work, consistency, and humble personality have made him a legend loved by millions of football fans around the world.
+Messi's journey is an inspiration because he faced difficulties early in his life but he  never gave up on his dream. His talent, hard work, consistency, and humble personality have made him a legend loved by millions of football fans around the world.
 """
 
 splitter = RecursiveCharacterTextSplitter(
