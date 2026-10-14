@@ -10,11 +10,8 @@ llm = HuggingFaceEndpoint(
     task="text-generation",
     provider="auto",
 )
-
 model = ChatHuggingFace(llm=llm)
-
 parser = JsonOutputParser()         
-
 template = PromptTemplate(
     template="Give me the name, age and city of a fictional person \n {format_instruction}",
     input_variables=[],
