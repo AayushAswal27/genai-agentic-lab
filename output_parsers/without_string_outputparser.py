@@ -21,7 +21,7 @@ template1 = PromptTemplate(
 
 # 2nd prompt -> summary
 template2 = PromptTemplate(
-    template="Write a 5 line summary on the following text. /n {text}",
+    template="Summarize the following text in 5 clear bullet points. Keep the summary simple and concise:\n{text}",
     input_variables=["text"]
 )
 
