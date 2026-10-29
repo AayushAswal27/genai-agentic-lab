@@ -1,26 +1,33 @@
-# pip install -U langchain langchain-openai langchain-community faiss-cpu pypdf python-dotenv langsmith
+# pip install -U langchain langchain-google-genai langchain-community langchain-huggingface sentence-transformers faiss-cpu pypdf python-dotenv langsmith
 
 import os
 import json
 import hashlib
 from pathlib import Path
-from dotenv import load_dotenv
+from dotenv import load_dotenv, find_dotenv
+
+# --- env BEFORE importing langsmith/langchain ---
+load_dotenv(find_dotenv())
+os.environ["LANGCHAIN_TRACING_V2"] = "true"
+os.environ["LANGCHAIN_PROJECT"] = "RAG"
 
 from langsmith import traceable
 
 from langchain_community.document_loaders import PyPDFLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_openai import OpenAIEmbeddings, ChatOpenAI
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_community.vectorstores import FAISS
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnableParallel, RunnablePassthrough, RunnableLambda
 from langchain_core.output_parsers import StrOutputParser
 
-load_dotenv()
-
-PDF_PATH = "islr.pdf"  # change to your file
-INDEX_ROOT = Path(".indices")
+BASE_DIR = Path(__file__).resolve().parent
+PDF_PATH = str(BASE_DIR / "islr.pdf")
+INDEX_ROOT = BASE_DIR / ".indices"
 INDEX_ROOT.mkdir(exist_ok=True)
+
+EMBED_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
 
 # ----------------- helpers (traced) -----------------
 @traceable(name="load_pdf")
@@ -36,7 +43,7 @@ def split_documents(docs, chunk_size=1000, chunk_overlap=150):
 
 @traceable(name="build_vectorstore")
 def build_vectorstore(splits, embed_model_name: str):
-    emb = OpenAIEmbeddings(model=embed_model_name)
+    emb = HuggingFaceEmbeddings(model_name=embed_model_name)
     return FAISS.from_documents(splits, emb)
 
 # ----------------- cache key / fingerprint -----------------
@@ -61,7 +68,7 @@ def _index_key(pdf_path: str, chunk_size: int, chunk_overlap: int, embed_model_n
 # ----------------- explicitly traced load/build runs -----------------
 @traceable(name="load_index", tags=["index"])
 def load_index_run(index_dir: Path, embed_model_name: str):
-    emb = OpenAIEmbeddings(model=embed_model_name)
+    emb = HuggingFaceEmbeddings(model_name=embed_model_name)
     return FAISS.load_local(
         str(index_dir),
         emb,
@@ -88,7 +95,7 @@ def load_or_build_index(
     pdf_path: str,
     chunk_size: int = 1000,
     chunk_overlap: int = 150,
-    embed_model_name: str = "text-embedding-3-small",
+    embed_model_name: str = EMBED_MODEL,
     force_rebuild: bool = False,
 ):
     key = _index_key(pdf_path, chunk_size, chunk_overlap, embed_model_name)
@@ -100,7 +107,7 @@ def load_or_build_index(
         return build_index_run(pdf_path, index_dir, chunk_size, chunk_overlap, embed_model_name)
 
 # ----------------- model, prompt, and pipeline -----------------
-llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
+llm = ChatGoogleGenerativeAI(model="gemini-3.1-flash-lite", temperature=0, max_retries=5)
 
 prompt = ChatPromptTemplate.from_messages([
     ("system", "Answer ONLY from the provided context. If not found, say you don't know."),
@@ -111,7 +118,7 @@ def format_docs(docs):
     return "\n\n".join(d.page_content for d in docs)
 
 @traceable(name="setup_pipeline", tags=["setup"])
-def setup_pipeline(pdf_path: str, chunk_size=1000, chunk_overlap=150, embed_model_name="text-embedding-3-small", force_rebuild=False):
+def setup_pipeline(pdf_path: str, chunk_size=1000, chunk_overlap=150, embed_model_name=EMBED_MODEL, force_rebuild=False):
     return load_or_build_index(
         pdf_path=pdf_path,
         chunk_size=chunk_size,
@@ -126,7 +133,7 @@ def setup_pipeline_and_query(
     question: str,
     chunk_size: int = 1000,
     chunk_overlap: int = 150,
-    embed_model_name: str = "text-embedding-3-small",
+    embed_model_name: str = EMBED_MODEL,
     force_rebuild: bool = False,
 ):
     vectorstore = setup_pipeline(pdf_path, chunk_size, chunk_overlap, embed_model_name, force_rebuild)
