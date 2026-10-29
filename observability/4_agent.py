@@ -26,8 +26,7 @@ llm = ChatGoogleGenerativeAI(model="gemini-3.1-flash-lite", temperature=0, max_r
 
 agent = create_agent(llm, tools=[search_tool, get_weather_data])
 
-# What is the current temp of gurgaon
-# Identify the birthplace city of Kalpana Chawla (search) and give its current temperature.
+
 
 response = agent.invoke({"messages": [("human", "What is the current temp of gurgaon")]})
 print(response)
