@@ -19,7 +19,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnableParallel, RunnablePassthrough, RunnableLambda
 from langchain_core.output_parsers import StrOutputParser
 
-PDF_PATH = "/Users/aayushaswal/genai-agentic-lab/langsmith-masterclass/islr.pdf"
+PDF_PATH = "/Users/aayushaswal/genai-agentic-lab/observability/islr.pdf"
 
 # ----------------- helpers -----------------
 @traceable(name="load_pdf")
