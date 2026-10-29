@@ -1,18 +1,20 @@
-# pip install -U langgraph langchain-openai pydantic python-dotenv langsmith
-
 import operator
 from typing import TypedDict, Annotated, List
 
-from dotenv import load_dotenv
-from pydantic import BaseModel, Field
+from dotenv import load_dotenv, find_dotenv
 
+# --- env BEFORE importing langsmith/langchain ---
+load_dotenv(find_dotenv())
+import os
+os.environ["LANGCHAIN_PROJECT"] = "langgraph-essay-checker"
+
+from pydantic import BaseModel, Field
 from langsmith import traceable
-from langchain_openai import ChatOpenAI
+from langchain_google_genai import ChatGoogleGenerativeAI
 from langgraph.graph import StateGraph, START, END
 
 # ---------- Setup ----------
-load_dotenv()
-model = ChatOpenAI(model="gpt-4o-mini", temperature=0)
+model = ChatGoogleGenerativeAI(model="gemini-3.1-flash-lite", temperature=0, max_retries=5)
 
 # ---------- Structured schema & model ----------
 class EvaluationSchema(BaseModel):
@@ -26,7 +28,7 @@ essay2 = """India and AI Time
 
 Now world change very fast because new tech call Artificial Intel… something (AI). India also want become big in this AI thing. If work hard, India can go top. But if no careful, India go back.
 
-India have many good. We have smart student, many engine-ear, and good IT peoples. Big company like TCS, Infosys, Wipro already use AI. Government also do program “AI for All”. It want AI in farm, doctor place, school and transport.
+India have many good. We have smart student, many engine-ear, and good IT peoples. Big company like TCS, Infosys, Wipro already use AI. Government also do program "AI for All". It want AI in farm, doctor place, school and transport.
 
 In farm, AI help farmer know when to put seed, when rain come, how stop bug. In health, AI help doctor see sick early. In school, AI help student learn good. Government office use AI to find bad people and work fast.
 
@@ -87,7 +89,7 @@ def final_evaluation(state: UPSCState):
         f"Depth of analysis feedback: {state.get('analysis_feedback','')}\n"
         f"Clarity of thought feedback: {state.get('clarity_feedback','')}\n"
     )
-    overall = model.invoke(prompt).content
+    overall = model.invoke(prompt).text
     scores = state.get("individual_scores", []) or []
     avg = (sum(scores) / len(scores)) if scores else 0.0
     return {"overall_feedback": overall, "avg_score": avg}
@@ -120,7 +122,7 @@ if __name__ == "__main__":
             "tags": ["essay", "langgraph", "evaluation"],
             "metadata": {
                 "essay_length": len(essay2),
-                "model": "gpt-4o-mini",
+                "model": "gemini-3.1-flash-lite",
                 "dimensions": ["language", "analysis", "clarity"],
             },
         },
