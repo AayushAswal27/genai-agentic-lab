@@ -13,7 +13,7 @@ from langchain_core.output_parsers import StrOutputParser
 
 load_dotenv(find_dotenv())  # finds your root .env; expects GOOGLE_API_KEY
 
-os.environ['LANHCHAIN_PROJECT']="RAG"
+os.environ['LANGCHAIN_PROJECT']="RAG"
 
 PDF_PATH = "/Users/aayushaswal/genai-agentic-lab/langsmith-masterclass/islr.pdf"  # <-- change to your PDF filename
 
