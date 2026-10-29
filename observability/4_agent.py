@@ -8,7 +8,7 @@ import requests
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.tools import tool
 from langchain_community.tools import DuckDuckGoSearchRun
-from langgraph.prebuilt import create_react_agent
+from langchain.agents import create_agent
 
 search_tool = DuckDuckGoSearchRun()
 
@@ -17,13 +17,14 @@ def get_weather_data(city: str) -> str:
     """
     This function fetches the current weather data for a given city
     """
-    url = f'https://api.weatherstack.com/current?access_key=f07d9636974c4120025fadf60678771b&query={city}'
+    key = os.getenv("WEATHERSTACK_KEY")
+    url = f'https://api.weatherstack.com/current?access_key={key}&query={city}'
     response = requests.get(url)
     return response.json()
 
 llm = ChatGoogleGenerativeAI(model="gemini-3.1-flash-lite", temperature=0, max_retries=5)
 
-agent = create_react_agent(llm, tools=[search_tool, get_weather_data])
+agent = create_agent(llm, tools=[search_tool, get_weather_data])
 
 # What is the current temp of gurgaon
 # Identify the birthplace city of Kalpana Chawla (search) and give its current temperature.
