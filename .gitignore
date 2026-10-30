@@ -4,8 +4,12 @@ __pycache__/
 venv/
 myenv/
 .env
+*.env
 .DS_Store
 .virtual_documents/
 .ipynb_checkpoints/**/.indices/
 **/.ipynb_checkpoints/
 **/.indices/
+*.db
+*.db-shm
+*.db-wal
