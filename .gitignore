@@ -7,3 +7,5 @@ myenv/
 .DS_Store
 .virtual_documents/
 .ipynb_checkpoints/**/.indices/
+**/.ipynb_checkpoints/
+**/.indices/
