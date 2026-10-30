@@ -24,6 +24,17 @@ def load_conversation(thread_id):
     # Check if messages key exists in state values, return empty list if not
     return state.values.get('messages', [])
 
+def extract_text(content):
+    if isinstance(content, str):
+        return content
+    if isinstance(content, list):
+        return "".join(
+            block.get("text", "")
+            for block in content
+            if isinstance(block, dict) and block.get("type") == "text"
+        )
+    return str(content)
+
 
 # **************************************** Session Setup ******************************
 if 'message_history' not in st.session_state:
@@ -59,7 +70,7 @@ for thread_id in st.session_state['chat_threads'][::-1]:
                 role='user'
             else:
                 role='assistant'
-            temp_messages.append({'role': role, 'content': msg.content})
+            temp_messages.append({'role': role, 'content': extract_text(msg.content)})
 
         st.session_state['message_history'] = temp_messages
 
@@ -80,8 +91,6 @@ if user_input:
     with st.chat_message('user'):
         st.text(user_input)
 
-    #CONFIG = {'configurable': {'thread_id': st.session_state['thread_id']}}
-
     CONFIG = {
         "configurable": {"thread_id": st.session_state["thread_id"]},
         "metadata": {
@@ -90,14 +99,14 @@ if user_input:
         "run_name": "chat_turn",
     }
 
-    # first add the message to message_history
     with st.chat_message('assistant'):
 
         ai_message = st.write_stream(
-            message_chunk.content for message_chunk, metadata in chatbot.stream(
+            extract_text(message_chunk.content)
+            for message_chunk, metadata in chatbot.stream(
                 {'messages': [HumanMessage(content=user_input)]},
-                config= CONFIG,
-                stream_mode= 'messages'
+                config=CONFIG,
+                stream_mode='messages'
             )
         )
 
