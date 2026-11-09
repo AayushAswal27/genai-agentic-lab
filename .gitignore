@@ -13,3 +13,4 @@ myenv/
 *.db
 *.db-shm
 *.db-wal
+*.pdf
