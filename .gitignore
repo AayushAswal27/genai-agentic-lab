@@ -14,3 +14,5 @@ myenv/
 *.db-shm
 *.db-wal
 *.pdf
+*.pdf
+crag_index/
